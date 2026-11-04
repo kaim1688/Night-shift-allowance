@@ -10,12 +10,12 @@
 </head>
 <body>
   <div class="screen">
-    <header class="app-header"><div><h1>夜點費填表器</h1><p>匯入班表，核對明細，列印個人請領表。</p></div><span class="local-label">v0.1.3 · 資料不外傳</span><button id="theme-toggle" type="button" aria-pressed="false">深色模式</button></header>
+    <header class="app-header"><div><h1>夜點費填表器</h1><p>匯入班表，核對明細，列印個人請領表。</p></div><span class="local-label">v0.1.4 · 資料不外傳</span><button id="theme-toggle" type="button" aria-pressed="false">深色模式</button></header>
     <main>
-      <section id="roster-import" class="import-panel roster-panel" aria-labelledby="roster-title"><div><h2 id="roster-title">1. 載入人員名冊</h2><p id="roster-state">支援 .xlsx 或 .json，名冊僅在瀏覽器處理。</p></div><div class="upload-control"><label for="roster-file">選擇或更換人員名冊</label><input id="roster-file" type="file" accept=".json,.xlsx"></div></section>
+      <section id="roster-import" class="import-panel roster-panel" aria-labelledby="roster-title"><div><h2 id="roster-title">1. 載入人員名冊</h2><p id="roster-state">支援 .xlsx 或 .json，名冊僅在瀏覽器處理。</p></div><div class="upload-control"><button id="choose-roster" class="primary file-button" type="button" aria-describedby="roster-state">選擇名冊檔案</button><input id="roster-file" type="file" accept=".json,.xlsx" hidden></div></section>
       <section class="import-panel" aria-labelledby="import-title">
         <div><h2 id="import-title">2. 上傳每月班表</h2><p>使用 .xlsx 檔案。只計算夜班。</p><button id="print-blank" class="blank-button" type="button">列印空白表格</button></div>
-        <div class="upload-control"><label for="schedule-file">選擇 Excel 班表</label><input id="schedule-file" type="file" accept=".xlsx"><span id="file-state" role="status">尚未匯入</span></div>
+        <div class="upload-control"><button id="choose-schedule" class="primary file-button" type="button" aria-describedby="file-state">選擇班表</button><input id="schedule-file" type="file" accept=".xlsx" hidden><span id="file-state" role="status">尚未匯入</span></div>
       </section>
 
       <div id="error" class="error" role="alert" hidden></div>
@@ -45,7 +45,7 @@
         <details class="rules"><summary>計算與列印說明</summary><ul><li>「夜、$夜、*夜」每晚共400元。名冊中的售票領班預設18:40～次日06:40；其他人預設18:50～次日06:50，替班可在逐日設定切換。</li><li>以開始上班日期歸入月份；常日班人員替到夜班也會納入。其他班別不計。</li><li>含請假註記或非標準夜班文字會列為待核對，不會直接計算或列印。無班表資料不視為零夜班。</li><li>請依實際出勤核對。列印選擇 A4、直向、縮放 100%，並關閉瀏覽器頁首及頁尾；也可另存 PDF。</li><li>每頁最多 19 筆，超過會自動續頁。勾選僅決定列印對象，搜尋不會改變勾選。</li></ul></details>
       </section>
     </main>
-    <footer>個人夜點費請領表 · v0.1.3 <span>員工代號保留前導 0，簽章欄由本人及主管填寫。</span></footer>
+    <footer>個人夜點費請領表 · v0.1.4 <span>員工代號保留前導 0，簽章欄由本人及主管填寫。</span></footer>
   </div>
   <div id="print-area"></div>
 </body>

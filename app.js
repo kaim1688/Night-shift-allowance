@@ -5,7 +5,23 @@ const $ = id => document.getElementById(id);
 const escape = text => String(text).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const money = value => value.toLocaleString('zh-TW');
 const statusLabel = {ready:'可列印', none:'無夜班', missing:'無班表資料', review:'待核對', unknown:'未建檔'};
+let eatingTimer;
 let employees = [], schedule = null, reports = [], selected = new Set(), activeName = '', importVersion = 0;
+
+function setScheduleEnabled(enabled) {
+  $('schedule-file').disabled = !enabled;
+  $('choose-schedule').disabled = !enabled;
+}
+$('choose-roster').addEventListener('click', () => $('roster-file').click());
+$('choose-schedule').addEventListener('click', () => $('schedule-file').click());
+
+function setCatConfused(confused) {
+  clearTimeout(eatingTimer);
+  $('cat-station').classList.remove('eating');
+  $('cat-station').classList.toggle('confused', confused);
+  $('cat-greeting').textContent = confused ? '這個看不懂~' : '喵~幫你填表!';
+  if (confused) $('empty').hidden = false;
+}
 
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
@@ -23,6 +39,7 @@ $('theme-toggle').addEventListener('click', () => {
 
 function reset() {
   schedule = null; reports = []; selected.clear(); activeName = '';
+  setCatConfused(false);
   $('workspace').hidden = true; $('empty').hidden = false;
   $('print-area').replaceChildren(); $('preview').replaceChildren();
   $('print-button').disabled = true; $('print-person').disabled = true;
@@ -149,6 +166,7 @@ $('schedule-file').addEventListener('change', async event => {
     reset(); $('error').hidden = false;
     $('error').textContent = error.message || '無法讀取班表，請重新選擇檔案。';
     $('file-state').textContent = '匯入未完成，請重新選擇檔案。';
+    setCatConfused(true);
   } finally {
     if (version === importVersion) event.target.value = '';
   }
@@ -163,8 +181,8 @@ $('print-blank').addEventListener('click', () => {
   document.title = '夜點費空白請領表';
   window.print();
 });
-let eatingTimer;
 function feedCat() {
+  if ($('cat-station').classList.contains('confused')) return;
   clearTimeout(eatingTimer);
   $('cat-station').classList.add('eating');
   $('cat-greeting').textContent = '喵，夜點開動！你也記得休息。';
@@ -184,7 +202,7 @@ try {
   employees = await response.json();
   if (Array.isArray(employees) && !employees.length) {
     $('roster-import').hidden = false;
-    $('schedule-file').disabled = true;
+    setScheduleEnabled(false);
     $('file-state').textContent = '請先載入人員名冊，再選擇班表。';
   } else {
     validateEmployees(employees);
@@ -193,7 +211,7 @@ try {
 } catch {
   $('error').hidden=false;
   $('error').textContent='無法載入人員名冊，請確認 employees.json 存在且格式正確，再重新整理頁面。';
-  $('schedule-file').disabled=true;
+  setScheduleEnabled(false);
 }
 $('roster-file').addEventListener('change', async event => {
   const file = event.target.files[0];
@@ -203,12 +221,13 @@ $('roster-file').addEventListener('change', async event => {
     const next = file.name.toLowerCase().endsWith('.json') ? validateEmployees(JSON.parse(await file.text())) : readEmployees(await file.arrayBuffer());
     reset();
     employees = next;
-    $('schedule-file').disabled = false;
+    setScheduleEnabled(true);
     $('roster-state').textContent = `已載入 ${employees.length} 人；名冊只保留在本頁，重新整理後需重選。`;
     $('file-state').textContent = '人員名冊已載入，請選擇班表。';
     $('error').hidden = true;
   } catch (error) {
     $('error').hidden = false;
-    $('error').textContent = error.message;
+    $('error').textContent = (error instanceof SyntaxError ? '名冊格式不正確，請選擇正確的 .json 或 .xlsx 名冊。' : error.message) + (employees.length ? ' 原名冊仍保留，請重新選擇。' : '');
+    setCatConfused(true);
   } finally {event.target.value = '';}
 });

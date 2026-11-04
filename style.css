@@ -119,6 +119,16 @@ select:focus-visible { outline: 3px solid #b77716; outline-offset: 2px; }
 .station-art #pet-cat:hover { background: transparent; }
 .station-art #pet-cat:focus-visible { outline: 2px dashed #b77716; outline-offset: 3px; }
 .station-caption { font-size: 11px; letter-spacing: 1px; }
+.file-button { min-height: 48px; min-width: 210px; font-size: 16px; }
+.confused .cat-pose { transform-box: fill-box; transform-origin: 50% 60%; transform: rotate(-88deg); animation: cat-tumble .45s steps(4,end) both; }
+.confused #cat-greeting { color: #8b302d; font-weight: 600; }
+@keyframes cat-tumble { from { transform: rotate(0); } to { transform: rotate(-88deg); } }
+@media screen {
+  [data-theme="dark"] .confused #cat-greeting { color: #ffd3d3; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .confused .cat-pose { animation: none; }
+}
 @media screen {
   [data-theme="dark"] .empty, [data-theme="dark"] .cat-station,
   [data-theme="dark"] .cat-station #cat-greeting { background: transparent; border: 0; }
