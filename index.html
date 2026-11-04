@@ -10,21 +10,22 @@
 </head>
 <body>
   <div class="screen">
-    <header class="app-header"><div class="brand-mark" aria-hidden="true">三花</div><div><h1>夜點費填表器</h1><p>匯入班表，核對明細，列印個人請領表。</p></div><span class="local-label">v0.1.1 · 資料不外傳</span><button id="theme-toggle" type="button" aria-pressed="false">深色模式</button></header>
+    <header class="app-header"><div><h1>夜點費填表器</h1><p>匯入班表，核對明細，列印個人請領表。</p></div><span class="local-label">v0.1.3 · 資料不外傳</span><button id="theme-toggle" type="button" aria-pressed="false">深色模式</button></header>
     <main>
+      <section id="roster-import" class="import-panel roster-panel" aria-labelledby="roster-title"><div><h2 id="roster-title">1. 載入人員名冊</h2><p id="roster-state">支援 .xlsx 或 .json，名冊僅在瀏覽器處理。</p></div><div class="upload-control"><label for="roster-file">選擇或更換人員名冊</label><input id="roster-file" type="file" accept=".json,.xlsx"></div></section>
       <section class="import-panel" aria-labelledby="import-title">
-        <div><h2 id="import-title">上傳每月班表</h2><p>使用 .xlsx 檔案。只計算夜班。</p><button id="print-blank" class="blank-button" type="button">列印空白表格</button></div>
+        <div><h2 id="import-title">2. 上傳每月班表</h2><p>使用 .xlsx 檔案。只計算夜班。</p><button id="print-blank" class="blank-button" type="button">列印空白表格</button></div>
         <div class="upload-control"><label for="schedule-file">選擇 Excel 班表</label><input id="schedule-file" type="file" accept=".xlsx"><span id="file-state" role="status">尚未匯入</span></div>
       </section>
-      <section id="roster-import" class="notice" hidden><label for="roster-file">載入人員名冊（.json或.xlsx）</label><input id="roster-file" type="file" accept=".json,.xlsx"><p id="roster-state">建議選擇私人名冊.json（包含售票領班設定）；也支援基本資料.xlsx，Excel第四欄可填ticket指定售票領班。資料僅在瀏覽器處理。</p></section>
+
       <div id="error" class="error" role="alert" hidden></div>
-      <section id="empty" class="empty"><div class="welcome-copy"><h2>夜班的事，<br>三花幫你整理。</h2><p>選擇這個月的班表，<br>就能準備每個人的夜點費請領表。</p><p class="small">姓名簽章留白，核對後即可列印。</p></div><div id="cat-station" class="cat-station"><p id="cat-greeting">喵，今天也辛苦了。</p><button id="pet-cat" type="button" aria-label="和三花貓打招呼"><svg viewBox="0 0 380 270" aria-hidden="true" focusable="false" shape-rendering="crispEdges"><path class="pixel-sun" fill="#e7bc69" d="M315 18h26v5h5v26h-5v5h-26v-5h-5V23h5z"/><path class="pixel-clouds" fill="#fffaf0" d="M25 62h28V52h38v10h25v10H25z"/><path class="pixel-moon" fill="#d8b367" d="M315 20h25v5h-15v20h20v-5h5v15h-5v5h-30v-5h-5V25h5z"/><path class="pixel-stars" fill="#c5a96f" d="M40 25h4v4h-4zm160-10h4v4h-4zm80 90h4v4h-4z"/><path fill="#a3af8b" d="M10 221h35v-9h40v9h210v-12h25v12h45v28H10z"/><path fill="#d4c7a8" d="M10 238h355v16H10z"/><path fill="#6c6b5c" d="M10 254h355v4H10zm0 9h355v4H10z"/><g class="station-sign"><path fill="#57765c" d="M21 152h66v5H21zm6 5h54v40H27zm9 40h5v35h-5z"/><path fill="#fffaf0" d="M32 163h44v27H32z"/><text x="54" y="175" text-anchor="middle" fill="#405443" font-size="8">三花小站</text><text x="54" y="185" text-anchor="middle" fill="#405443" font-size="5">CALICO</text></g><path fill="#9a805e" d="M287 203h56v6h-56zm5 6h5v25h-5zm42 0h5v25h-5zm-47-17h56v6h-56z"/><g class="cat" transform="translate(80 38) scale(6)">
+      <section id="empty" class="empty"><div id="cat-station" class="cat-station"><p id="cat-greeting">喵~幫你填表!</p><div class="station-art"><button id="pet-cat" type="button" aria-label="請三花吃夜點" title="點三花貓身體，請牠吃夜點"></button><svg viewBox="0 0 380 270" aria-hidden="true" focusable="false" shape-rendering="crispEdges"><path class="pixel-sun" fill="#e7bc69" d="M315 18h26v5h5v26h-5v5h-26v-5h-5V23h5z"/><path class="pixel-clouds" fill="#fffaf0" d="M25 62h28V52h38v10h25v10H25z"/><path class="pixel-moon" fill="#d8b367" d="M315 20h25v5h-15v20h20v-5h5v15h-5v5h-30v-5h-5V25h5z"/><path class="pixel-stars" fill="#c5a96f" d="M40 25h4v4h-4zm160-10h4v4h-4zm80 90h4v4h-4z"/><path fill="#a3af8b" d="M10 221h35v-9h40v9h210v-12h25v12h45v28H10z"/><path fill="#d4c7a8" d="M10 238h355v16H10z"/><path fill="#6c6b5c" d="M10 254h355v4H10zm0 9h355v4H10z"/><g class="station-sign"><path fill="#57765c" d="M21 152h66v5H21zm6 5h54v40H27zm9 40h5v35h-5z"/><path fill="#fffaf0" d="M32 163h44v27H32z"/><text x="54" y="175" text-anchor="middle" fill="#405443" font-size="8">三花小站</text><text x="54" y="185" text-anchor="middle" fill="#405443" font-size="5">CALICO</text></g><path fill="#9a805e" d="M287 203h56v6h-56zm5 6h5v25h-5zm42 0h5v25h-5zm-47-17h56v6h-56z"/><g class="cat" transform="translate(80 38) scale(6)">
               <g class="cat-pose">
               <path class="tail" fill="#b9682c" d="M23 22h4v-2h3v-7h-3v-3h3v1h3v10h-2v4h-8z"/>
               <path fill="#e8dfcc" d="M4 3h3v2h2v3h10V5h2V3h3v6h2v13h-2v7h-2v2H5v-2H3v-6H1V11h3z"/>
               <path fill="#fffaf0" d="M6 7h3v3h10V7h3v5h2v9h-3v5H6v-5H3v-9h3z"/>
               <path fill="#d78c42" d="M4 3h3v2h2v3h3v6H3v-3h1zM3 17h4v3H3zM4 25h3v2H4z"/><path fill="#3e4141" d="M19 8V5h2V3h3v6h2v7h-8v-5h1zM20 24h4v3h-4z"/>
-              <path class="eyes" fill="#493a2b" d="M7 15h2v3H7zm11 0h2v3h-2z"/>
+              <path fill="#deaa91" d="M5 5h1v3H5zm17 0h1v3h-1z"/><path class="eyes" fill="#493a2b" d="M7 15h2v3H7zm11 0h2v3h-2z"/>
               
               <path fill="#fff0c7" d="M9 19h9v3h-2v2h-5v-2H9zm1 8h8v4h-8z"/>
               <path fill="#a95838" d="M12 19h3v2h-3z"/><path class="chew-mouth" fill="#493a2b" d="M13 22h2v1h-2z"/>
@@ -33,7 +34,7 @@
               <g class="snack-paw"><path fill="#e8dfcc" d="M21 24h4v3h-4z"/><path fill="#f7f0da" d="M22 23h3v2h-3z"/><path fill="#405d47" d="M22 24h3v1h-3z"/></g>
               </g>
             </g>
-            <g class="night-snack"><path fill="#faf5e5" d="M140 210h19v14h-19zm36 0h19v14h-19z"/><path fill="#405d47" d="M145 218h9v6h-9zm36 0h9v6h-9z"/><path fill="#b68451" d="M205 205h16v20h-16z"/><path class="steam" fill="#f4e6c8" d="M210 196h3v6h-3zm6-4h3v8h-3z"/></g><path fill="#8d7255" d="M113 224h121v8H113z"/><path fill="#e8dcc2" d="M120 232h107v12H120z"/><path fill="#7a664d" d="M144 236h60v4h-60z"/></svg></button><p class="station-caption"><span class="day-caption">三花小站 · 等你帶班表來</span><span class="night-caption">三花小站 · 夜點時間到了</span></p><button id="feed-cat" type="button">請三花吃夜點</button></div></section>
+            <g class="night-snack"><path fill="#faf5e5" d="M140 210h19v14h-19zm36 0h19v14h-19z"/><path fill="#405d47" d="M145 218h9v6h-9zm36 0h9v6h-9z"/><path fill="#b68451" d="M205 205h16v20h-16z"/><path class="steam" fill="#f4e6c8" d="M210 196h3v6h-3zm6-4h3v8h-3z"/></g><path fill="#8d7255" d="M113 224h121v8H113z"/><path fill="#e8dcc2" d="M120 232h107v12H120z"/><path fill="#7a664d" d="M144 236h60v4h-60z"/></svg></div><p class="station-caption"><span class="day-caption">三花小站 · 等你帶班表來</span><span class="night-caption">三花小站 · 夜點時間到了</span></p></div></section>
       <section id="workspace" hidden>
         <div class="month-toolbar"><div><h2 id="period-title"></h2><p id="summary" aria-live="polite"></p></div><button id="print-button" class="primary" type="button" disabled>列印已勾選表格</button></div>
         <div id="warnings" class="notice" hidden></div>
@@ -44,7 +45,7 @@
         <details class="rules"><summary>計算與列印說明</summary><ul><li>「夜、$夜、*夜」每晚共400元。名冊中的售票領班預設18:40～次日06:40；其他人預設18:50～次日06:50，替班可在逐日設定切換。</li><li>以開始上班日期歸入月份；常日班人員替到夜班也會納入。其他班別不計。</li><li>含請假註記或非標準夜班文字會列為待核對，不會直接計算或列印。無班表資料不視為零夜班。</li><li>請依實際出勤核對。列印選擇 A4、直向、縮放 100%，並關閉瀏覽器頁首及頁尾；也可另存 PDF。</li><li>每頁最多 19 筆，超過會自動續頁。勾選僅決定列印對象，搜尋不會改變勾選。</li></ul></details>
       </section>
     </main>
-    <footer>個人夜點費請領表 · v0.1.1 <span>員工代號保留前導 0，簽章欄由本人及主管填寫。</span></footer>
+    <footer>個人夜點費請領表 · v0.1.3 <span>員工代號保留前導 0，簽章欄由本人及主管填寫。</span></footer>
   </div>
   <div id="print-area"></div>
 </body>

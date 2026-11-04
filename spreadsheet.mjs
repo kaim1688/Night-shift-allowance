@@ -64,7 +64,6 @@ export function readSchedule(data) {
         const shifts = days.map(([col,day])=>({day,shift:cells.get(col) ?? ''}));
         if (person === '段替班') {
           if (shifts.some(d=>d.shift.includes('夜'))) throw new Error(`第 ${row+1} 列段替班有夜班，請先補上實際人員姓名。`);
-          warnings.push(`第 ${row+1} 列「段替班」無夜班，未列入個人表。`);
           continue;
         }
         if (seen.has(person)) throw new Error(`「${person}」重複出現在班表，請確認後重新匯入。`);
