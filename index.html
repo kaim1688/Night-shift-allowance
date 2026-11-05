@@ -10,7 +10,7 @@
 </head>
 <body>
   <div class="screen">
-    <header class="app-header"><div><h1>夜點費填表器</h1><p>匯入班表，核對明細，列印個人請領表。</p></div><span class="local-label">v0.1.5 · 資料不外傳</span><button id="theme-toggle" type="button" aria-pressed="false">深色模式</button></header>
+    <header class="app-header"><div><h1>夜點費填表器</h1><p>匯入班表，核對明細，列印個人請領表。</p></div><span class="local-label">v0.1.6 · 資料不外傳</span><button id="theme-toggle" type="button" aria-pressed="false">深色模式</button></header>
     <main>
       <section id="roster-import" class="import-panel roster-panel" aria-labelledby="roster-title"><div><h2 id="roster-title">1. 載入人員名冊</h2><p id="roster-state">支援 .xlsx 或 .json，名冊僅在瀏覽器處理。</p></div><div class="upload-control"><button id="choose-roster" class="primary file-button" type="button" aria-describedby="roster-state">選擇名冊檔案</button><input id="roster-file" type="file" accept=".json,.xlsx" hidden></div></section>
       <section class="import-panel" aria-labelledby="import-title">
@@ -36,7 +36,7 @@
             </g>
             <g class="pixel-hearts" fill="#b85856"><path d="M247 62h6v3h3v-3h6v3h3v6h-3v3h-3v3h-3v3h-3v-3h-3v-3h-3v-3h-3v-6h3zM275 45h4v2h2v-2h4v2h2v4h-2v2h-2v2h-2v2h-2v-2h-2v-2h-2v-2h-2v-4h2z"/></g><g class="night-snack"><path fill="#faf5e5" d="M140 210h19v14h-19zm36 0h19v14h-19z"/><path fill="#405d47" d="M145 218h9v6h-9zm36 0h9v6h-9z"/><path fill="#b68451" d="M205 205h16v20h-16z"/><path class="steam" fill="#f4e6c8" d="M210 196h3v6h-3zm6-4h3v8h-3z"/></g><path fill="#8d7255" d="M113 224h121v8H113z"/><path fill="#e8dcc2" d="M120 232h107v12H120z"/><path fill="#7a664d" d="M144 236h60v4h-60z"/></svg></div><p class="cat-hint small">點頭摸摸牠，點身體請牠吃夜點。</p><p class="station-caption"><span class="day-caption">三花小站 · 等你帶班表來</span><span class="night-caption">三花小站 · 夜點時間到了</span></p></div></section>
       <section id="workspace" hidden>
-        <div class="month-toolbar"><div><h2 id="period-title"></h2><p id="summary" aria-live="polite"></p></div><div><div class="output-actions"><button id="export-button" type="button" aria-describedby="export-note" disabled>匯出 Excel（已勾選 0 人）</button><button id="print-button" class="primary" type="button" disabled>列印已勾選表格</button></div><p id="export-status" class="export-status" role="status"></p></div></div><p id="export-note" class="export-note">Excel 匯出已勾選人員的彙總與逐日明細；原樣表格可透過列印另存 PDF。</p>
+        <div class="month-toolbar"><div><h2 id="period-title"></h2><p id="summary" aria-live="polite"></p></div><div><div class="output-actions"><button id="export-button" type="button" aria-describedby="export-note" disabled>匯出 Excel（已勾選 0 人）</button><button id="print-button" class="primary" type="button" disabled>列印已勾選表格</button></div><p id="export-status" class="export-status" role="status"></p></div></div><p id="export-note" class="export-note">Excel 含每人一張請領表工作表（簽章欄留白）、人員彙總與逐日明細；也可列印另存 PDF。</p>
         <div id="warnings" class="notice" hidden></div>
         <div class="workspace-grid">
           <aside class="people-panel" aria-labelledby="people-title"><div class="people-header"><h3 id="people-title">人員明細</h3><div class="selection-actions"><button id="select-all" type="button">全選可列印</button><button id="clear-all" type="button">取消全選</button></div><label class="search-label" for="search">搜尋姓名或員工代號</label><input id="search" type="search"></div><div id="people-list"></div><details id="excluded-people" class="excluded-people"><summary id="excluded-summary"></summary><div id="excluded-list"></div></details></aside>
@@ -45,7 +45,7 @@
         <details class="rules"><summary>計算與列印說明</summary><ul><li>「夜、$夜、*夜」每晚共400元。名冊中的售票領班預設18:40～次日06:40；其他人預設18:50～次日06:50，替班可在逐日設定切換。</li><li>以開始上班日期歸入月份；常日班人員替到夜班也會納入。其他班別不計。</li><li>含請假註記或非標準夜班文字會列為待核對，不會直接計算或列印。無班表資料不視為零夜班。</li><li>請依實際出勤核對。列印選擇 A4、直向、縮放 100%，並關閉瀏覽器頁首及頁尾；也可另存 PDF。</li><li>每頁最多 19 筆，超過會自動續頁。勾選僅決定列印對象，搜尋不會改變勾選。</li></ul></details>
       </section>
     </main>
-    <footer>個人夜點費請領表 · v0.1.5 <span>員工代號保留前導 0，簽章欄由本人及主管填寫。</span></footer>
+    <footer>個人夜點費請領表 · v0.1.6 <span>員工代號保留前導 0，簽章欄由本人及主管填寫。</span></footer>
   </div>
   <div id="print-area"></div>
 </body>

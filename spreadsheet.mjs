@@ -1,4 +1,6 @@
 import {NIGHT_AMOUNT, NIGHT_TIMES} from './model.mjs';
+import {appendClaimSheet} from './claim-export.mjs';
+export {serializeExportWorkbook} from './claim-export.mjs';
 
 function readWorkbook(data) {
   const bytes = new Uint8Array(data);
@@ -136,5 +138,6 @@ export function createExportWorkbook(schedule, reports, names) {
     }
     XLSX.utils.book_append_sheet(workbook,sheet,name);
   }
+  for (const person of people) appendClaimSheet(workbook,schedule,person);
   return workbook;
 }
