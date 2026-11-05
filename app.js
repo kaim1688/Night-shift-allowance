@@ -15,6 +15,16 @@ function setScheduleEnabled(enabled) {
 $('choose-roster').addEventListener('click', () => $('roster-file').click());
 $('choose-schedule').addEventListener('click', () => $('schedule-file').click());
 
+let catInView = false;
+function syncCatMotion() {
+  $('cat-station').classList.toggle('cat-awake', catInView && !document.hidden);
+}
+new IntersectionObserver(([entry]) => {
+  catInView = entry.isIntersecting;
+  syncCatMotion();
+}, {threshold:.05}).observe($('cat-station'));
+document.addEventListener('visibilitychange', syncCatMotion);
+
 function setCatConfused(confused) {
   clearTimeout(catTimer);
   $('cat-station').classList.remove('eating', 'patting');
@@ -89,6 +99,9 @@ function updateSelection() {
   $('export-button').disabled = !selected.size;
   $('export-button').textContent = `匯出 Excel（已勾選 ${selected.size} 人）`;
   $('export-status').textContent = '';
+  const picked = reports.filter(person => selected.has(person.name) && person.status === 'ready');
+  const nights = picked.reduce((sum,person) => sum+person.nights.length,0);
+  $('selection-summary').textContent = `已勾選 ${picked.length} 人 · ${nights} 次夜班 · ${money(nights*NIGHT_AMOUNT)} 元`;
 }
 
 function renderNightEditor(person) {
@@ -115,7 +128,7 @@ function renderPeople() {
   $('excluded-summary').textContent = `未列入請領的人員（${excluded.length} 人）`;
   $('excluded-people').hidden = !excluded.length;
   $('excluded-list').innerHTML = excluded.map(person => `<p>${escape(person.name)}<span>${statusLabel[person.status]}</span></p>`).join('');
-  $('people-list').innerHTML = visible.length ? visible.map(person => `<div class="person-row${person.name===activeName?' active':''}" data-name="${escape(person.name)}"><input type="checkbox" aria-label="列印${escape(person.name)}" ${selected.has(person.name)?'checked':''} ${person.status!=='ready'?'disabled':''}><button type="button" class="person-open"><strong>${escape(person.name)}</strong><small>${escape(person.title || '職稱待補')} · ${escape(person.code || '代號待補')}</small></button><span class="person-right">${person.status==='ready'?`<b>${person.nights.length} 次</b>${money(person.total)} 元`:`<span class="${['review','unknown'].includes(person.status)?'pending':''}">${statusLabel[person.status]}</span>`}</span></div>`).join('') : '<p class="no-results">找不到相符的人員。</p>';
+  $('people-list').innerHTML = visible.length ? visible.map(person => `<div class="person-row${person.name===activeName?' active':''}" data-name="${escape(person.name)}"><input type="checkbox" aria-label="選取${escape(person.name)}" ${selected.has(person.name)?'checked':''} ${person.status!=='ready'?'disabled':''}><button type="button" class="person-open"><strong>${escape(person.name)}</strong><small>${escape(person.title || '職稱待補')} · ${escape(person.code || '代號待補')}</small></button><span class="person-right">${person.status==='ready'?`<b>${person.nights.length} 次</b>${money(person.total)} 元`:`<span class="${['review','unknown'].includes(person.status)?'pending':''}">${statusLabel[person.status]}</span>`}</span></div>`).join('') : '<p class="no-results">找不到相符的人員。</p>';
   for (const row of $('people-list').querySelectorAll('.person-row')) {
     row.querySelector('input').addEventListener('change', event => {
       event.target.checked ? selected.add(row.dataset.name) : selected.delete(row.dataset.name);
@@ -161,7 +174,7 @@ $('schedule-file').addEventListener('change', async event => {
     if (incomplete.length) warnings.unshift(`待核對／未建檔：${incomplete.map(person => person.name).join('、')}。這些人員尚未納入金額及列印。`);
     $('warnings').hidden = !warnings.length;
     $('warnings').textContent = warnings.join(' ');
-    $('file-state').textContent = `${schedule.year-1911}年${schedule.month}月 · ${schedule.sheet} · 已匯入`;
+    $('file-state').textContent = `${file.name} · ${schedule.year-1911}年${schedule.month}月 · 已匯入`;
     $('excluded-people').open = false;
     $('night-editor').open = false;
     renderPeople();
