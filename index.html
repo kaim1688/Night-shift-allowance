@@ -10,7 +10,7 @@
 </head>
 <body>
   <div class="screen">
-    <header class="app-header"><div><h1>夜點費填表器</h1><p>匯入班表，核對明細，列印個人請領表。</p></div><span class="local-label">v0.1.7 · 資料不外傳</span><button id="theme-toggle" type="button" aria-pressed="false">深色模式</button></header>
+    <header class="app-header"><div><h1>夜點費填表器</h1><p>匯入班表，核對明細，列印個人請領表。</p></div><span class="local-label">v0.1.8 · 資料不外傳</span><button id="theme-toggle" type="button" aria-pressed="false">深色模式</button></header>
     <main>
       <section id="roster-import" class="import-panel roster-panel" aria-labelledby="roster-title"><div><h2 id="roster-title">1. 載入人員名冊</h2><p id="roster-state">支援 .xlsx 或 .json，名冊僅在瀏覽器處理。</p></div><div class="upload-control"><button id="choose-roster" class="primary file-button" type="button" aria-describedby="roster-state">選擇名冊檔案</button><input id="roster-file" type="file" accept=".json,.xlsx" hidden></div></section>
       <section class="import-panel" aria-labelledby="import-title">
@@ -40,12 +40,12 @@
         <div id="warnings" class="notice" hidden></div>
         <div class="workspace-grid">
           <aside class="people-panel" aria-labelledby="people-title"><div class="people-header"><h3 id="people-title">人員明細</h3><div class="selection-actions"><button id="select-all" type="button">全選可列印</button><button id="clear-all" type="button">取消全選</button></div><label class="search-label" for="search">搜尋姓名或員工代號</label><input id="search" type="search"></div><div id="people-list"></div><details id="excluded-people" class="excluded-people"><summary id="excluded-summary"></summary><div id="excluded-list"></div></details></aside>
-          <section class="preview-panel" aria-label="請領表預覽"><div class="preview-heading"><div><h3 id="preview-name">個人請領表</h3><p id="preview-note"></p></div><button id="print-person" type="button" disabled>只印此人</button></div><div id="person-message" class="notice" hidden></div><details id="night-editor" class="night-editor" hidden><summary>逐日夜班時間／替班設定</summary><p>售票領班為 18:40～次日06:40；一般夜班為18:50～次日06:50。設定套用至預覽及列印，重新匯入後重設。</p><div id="night-roles"></div></details><div class="paper-viewport" id="paper-viewport"><div id="preview"></div></div></section>
+          <section class="preview-panel" aria-label="請領表預覽"><div class="preview-heading"><div><h3 id="preview-name">個人請領表</h3><p id="preview-note"></p></div><button id="print-person" type="button" disabled>只印此人</button></div><div id="person-message" class="notice" hidden></div><details id="night-editor" class="night-editor" hidden><summary>逐日夜班時間／替班設定</summary><p>售票領班為18:40～次日06:40；副站長為18:56～次日06:56；一般夜班為18:50～次日06:50。設定套用至預覽、列印與Excel匯出，重新匯入後重設。</p><div id="night-roles"></div></details><div class="paper-viewport" id="paper-viewport"><div id="preview"></div></div></section>
         </div>
-        <details class="rules"><summary>計算與列印說明</summary><ul><li>「夜、$夜、*夜」每晚共400元。名冊中的售票領班預設18:40～次日06:40；其他人預設18:50～次日06:50，替班可在逐日設定切換。</li><li>以開始上班日期歸入月份；常日班人員替到夜班也會納入。其他班別不計。</li><li>含請假註記或非標準夜班文字會列為待核對，不會直接計算或列印。無班表資料不視為零夜班。</li><li>請依實際出勤核對。列印選擇 A4、直向、縮放 100%，並關閉瀏覽器頁首及頁尾；也可另存 PDF。</li><li>每頁最多 19 筆，超過會自動續頁。勾選套用至列印與匯出，搜尋不會改變勾選。</li></ul></details>
+        <details class="rules"><summary>計算與列印說明</summary><ul><li>「夜、$夜、*夜」每晚共400元。名冊中的副站長預設18:56～次日06:56，售票領班預設18:40～次日06:40；其他人預設18:50～次日06:50，替班可在逐日設定切換。</li><li>以開始上班日期歸入月份；常日班人員替到夜班也會納入。其他班別不計。</li><li>含請假註記或非標準夜班文字會列為待核對，不會直接計算或列印。無班表資料不視為零夜班。</li><li>請依實際出勤核對。列印選擇 A4、直向、縮放 100%，並關閉瀏覽器頁首及頁尾；也可另存 PDF。</li><li>每頁最多 19 筆，超過會自動續頁。勾選套用至列印與匯出，搜尋不會改變勾選。</li></ul></details>
       </section>
     </main>
-    <footer>個人夜點費請領表 · v0.1.7 <span>員工代號保留前導 0，簽章欄由本人及主管填寫。</span></footer>
+    <footer>個人夜點費請領表 · v0.1.8 <span>員工代號保留前導 0，簽章欄由本人及主管填寫。</span></footer>
   </div>
   <div id="print-area"></div>
 </body>

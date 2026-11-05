@@ -11,7 +11,9 @@ export const FORM_NOTES = [
 export const NIGHT_TIMES = {
   regular: {start: NIGHT_START, end: NIGHT_END},
   ticket: {start: '18:40', end: '06:40'},
+  deputy: {start: '18:56', end: '06:56'},
 };
+export const NIGHT_LABELS = {regular:'一般夜班', ticket:'售票領班夜班', deputy:'副站長夜班'};
 
 export function classifyShift(raw) {
   const shift = String(raw).replace(/\s/g, '').replace(/^[*$＄＊]+/, '');
@@ -25,7 +27,7 @@ export function buildReports(schedule, employees) {
   const known = new Set(employees.map(person => person.name));
   const reports = employees.map(employee => {
     const person = source.get(employee.name);
-    const role = employee.nightRole === 'ticket' ? 'ticket' : 'regular';
+    const role = employee.title === '副站長' ? 'deputy' : Object.hasOwn(NIGHT_TIMES, employee.nightRole) ? employee.nightRole : 'regular';
     const nights = person?.days.filter(item => classifyShift(item.shift) === 'night')
       .map(item => ({...item, role})) ?? [];
     const issues = person?.days.filter(item => classifyShift(item.shift) === 'review') ?? [];

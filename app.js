@@ -1,4 +1,4 @@
-import {buildReports, pageChunks, NIGHT_AMOUNT, NIGHT_TIMES, FORM_WORK_TYPES, FORM_NOTES} from './model.mjs';
+import {buildReports, pageChunks, NIGHT_AMOUNT, NIGHT_TIMES, NIGHT_LABELS, FORM_WORK_TYPES, FORM_NOTES} from './model.mjs';
 import {readSchedule, readEmployees, validateEmployees, createExportWorkbook, serializeExportWorkbook} from './spreadsheet.mjs';
 
 const $ = id => document.getElementById(id);
@@ -107,7 +107,7 @@ function updateSelection() {
 function renderNightEditor(person) {
   $('night-editor').hidden = person.status !== 'ready';
   $('night-roles').innerHTML = person.status === 'ready' ? person.nights.map(night =>
-    `<label>${schedule.month}月${night.day}日<select data-day="${night.day}"><option value="regular" ${night.role==='regular'?'selected':''}>一般夜班 18:50～06:50</option><option value="ticket" ${night.role==='ticket'?'selected':''}>售票領班 18:40～06:40</option></select></label>`).join('') : '';
+    `<label>${schedule.month}月${night.day}日<select data-day="${night.day}">${Object.entries(NIGHT_TIMES).map(([role,time]) => `<option value="${role}" ${night.role===role?'selected':''}>${NIGHT_LABELS[role]} ${time.start}～${time.end}</option>`).join('')}</select></label>`).join('') : '';
 }
 $('night-roles').addEventListener('change', event => {
   const select = event.target;

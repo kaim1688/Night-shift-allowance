@@ -1,4 +1,4 @@
-import {NIGHT_AMOUNT, NIGHT_TIMES} from './model.mjs';
+import {NIGHT_AMOUNT, NIGHT_TIMES, NIGHT_LABELS} from './model.mjs';
 import {appendClaimSheet} from './claim-export.mjs';
 export {serializeExportWorkbook} from './claim-export.mjs';
 
@@ -83,7 +83,7 @@ export function readSchedule(data) {
 }
 
 export function validateEmployees(people) {
-  if (!Array.isArray(people) || !people.length || people.some(p=>!p.name || !p.title || !/^\d{7}$/.test(p.code) || (p.nightRole != null && !['regular','ticket'].includes(p.nightRole))) ||
+  if (!Array.isArray(people) || !people.length || people.some(p=>!p.name || !p.title || !/^\d{7}$/.test(p.code) || (p.nightRole != null && !Object.hasOwn(NIGHT_TIMES,p.nightRole))) ||
       new Set(people.map(p=>p.name)).size !== people.length || new Set(people.map(p=>p.code)).size !== people.length)
     throw new Error('名冊需有姓名、職稱、7碼員工代號，且姓名及代號不能重複。');
   return people;
@@ -121,7 +121,7 @@ export function createExportWorkbook(schedule, reports, names) {
       const start = new Date(Date.UTC(schedule.year,schedule.month-1,night.day)).toISOString().slice(0,10);
       const end = new Date(Date.UTC(schedule.year,schedule.month-1,night.day+1)).toISOString().slice(0,10);
       const time = NIGHT_TIMES[night.role];
-      detail.push([start,person.name,person.title,person.code,night.shift,night.role==='ticket'?'售票領班夜班':'一般夜班',time.start,end,time.end,250,NIGHT_AMOUNT-250,NIGHT_AMOUNT]);
+      detail.push([start,person.name,person.title,person.code,night.shift,NIGHT_LABELS[night.role],time.start,end,time.end,250,NIGHT_AMOUNT-250,NIGHT_AMOUNT]);
     }
   }
   summary.push(['合計','','','',count,count*250,count*(NIGHT_AMOUNT-250),count*NIGHT_AMOUNT]);
