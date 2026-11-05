@@ -1,3 +1,5 @@
+import {NIGHT_AMOUNT, NIGHT_TIMES} from './model.mjs';
+
 function readWorkbook(data) {
   const bytes = new Uint8Array(data);
   if (!bytes.length || bytes.length > 10 * 1024 * 1024) throw new Error('請選擇10 MB以內的.xlsx檔案。');
@@ -99,4 +101,40 @@ export function readEmployees(data) {
     }
   }
   return validateEmployees(people);
+}
+
+// Export the current confirmed results, including manual per-day replacements.
+export function createExportWorkbook(schedule, reports, names) {
+  const people = reports.filter(person => names.has(person.name) && person.status === 'ready');
+  if (!people.length) throw new Error('請先勾選可列印的人員。');
+  const period = `${schedule.year-1911}年${schedule.month}月`;
+  const summary = [['年月','姓名','職稱','員工代號','夜班次數','基本時段金額（元）','加發時段金額（元）','合計（元）']];
+  const detail = [['上班日期','姓名','職稱','員工代號','原班別','夜班類型','開始時間','結束日期','結束時間','基本時段（元）','加發時段（元）','每晚金額（元）']];
+  let count = 0;
+  for (const person of people) {
+    const nights = person.nights.length;
+    count += nights;
+    summary.push([period,person.name,person.title,person.code,nights,nights*250,nights*(NIGHT_AMOUNT-250),nights*NIGHT_AMOUNT]);
+    for (const night of person.nights) {
+      const start = new Date(Date.UTC(schedule.year,schedule.month-1,night.day)).toISOString().slice(0,10);
+      const end = new Date(Date.UTC(schedule.year,schedule.month-1,night.day+1)).toISOString().slice(0,10);
+      const time = NIGHT_TIMES[night.role];
+      detail.push([start,person.name,person.title,person.code,night.shift,night.role==='ticket'?'售票領班夜班':'一般夜班',time.start,end,time.end,250,NIGHT_AMOUNT-250,NIGHT_AMOUNT]);
+    }
+  }
+  summary.push(['合計','','','',count,count*250,count*(NIGHT_AMOUNT-250),count*NIGHT_AMOUNT]);
+  const workbook = XLSX.utils.book_new();
+  for (const [name,rows,widths,numericStart] of [
+    ['人員彙總',summary,[16,14,18,14,12,23,23,18],4],
+    ['逐日明細',detail,[15,14,18,14,12,20,13,15,13,20,20,20],9],
+  ]) {
+    const sheet = XLSX.utils.aoa_to_sheet(rows);
+    sheet['!cols'] = widths.map(wch => ({wch}));
+    sheet['!autofilter'] = {ref:XLSX.utils.encode_range({s:{r:0,c:0},e:{r:rows.length-1-(name==='人員彙總'?1:0),c:widths.length-1}})};
+    for (let row=1; row<rows.length; row++) for (let col=numericStart; col<widths.length; col++) {
+      sheet[XLSX.utils.encode_cell({r:row,c:col})].z = '#,##0';
+    }
+    XLSX.utils.book_append_sheet(workbook,sheet,name);
+  }
+  return workbook;
 }

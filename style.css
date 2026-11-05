@@ -106,7 +106,12 @@ select:focus-visible { outline: 3px solid #b77716; outline-offset: 2px; }
   .eating .cat-pose, .eating .snack-paw, .eating .chew-mouth { animation: none; }
 }
 
-.unit-value { display:inline-block; width:28mm; height:6mm; border-bottom:1px solid #111; vertical-align:bottom; }
+.unit-value { display:inline-block; width:28mm; height:6mm; border-bottom:1px solid #111; vertical-align:bottom; text-align:center; }
+.work-option { display:block; padding-left:1.25em; text-indent:-1.25em; }
+.output-actions { display:flex; flex-wrap:wrap; gap:10px; }
+.export-note { font-size:13px; margin-bottom:8px; }
+.export-status { font-size:13px; }
+.export-status:not(:empty) { margin-top:8px; }
 
 /* The station shares the page surface; only the cat body is interactive. */
 .roster-panel { margin-bottom: 16px; }
@@ -118,6 +123,14 @@ select:focus-visible { outline: 3px solid #b77716; outline-offset: 2px; }
 .station-art #pet-cat { position: absolute; left: 22%; top: 20%; width: 42%; height: 64%; max-width: none; margin: 0; padding: 0; background: transparent; border: 0; }
 .station-art #pet-cat:hover { background: transparent; }
 .station-art #pet-cat:focus-visible { outline: 2px dashed #b77716; outline-offset: 3px; }
+.station-art #pet-cat { top:62%; height:22%; }
+.station-art #pet-head { position:absolute; left:26%; top:20%; width:36%; height:42%; padding:0; border:0; background:transparent; }
+.station-art #pet-head:hover { background:transparent; }
+.pixel-hearts { opacity:0; pointer-events:none; }
+.patting .cat-pose { transform-box:fill-box; transform-origin:center bottom; animation:cat-nuzzle .5s steps(2,end) 2; }
+.patting .pixel-hearts { animation:heart-rise 1.2s cubic-bezier(.16,1,.3,1) both; }
+@keyframes cat-nuzzle { 50% { transform:rotate(3deg); } }
+@keyframes heart-rise { 0% { opacity:0; transform:translateY(5px); } 15%,75% { opacity:1; } 100% { opacity:0; transform:translateY(-12px); } }
 .station-caption { font-size: 11px; letter-spacing: 1px; }
 .file-button { min-height: 48px; min-width: 210px; font-size: 16px; }
 .confused .cat-pose { transform-box: fill-box; transform-origin: 50% 60%; transform: rotate(-88deg); animation: cat-tumble .45s steps(4,end) both; }
@@ -128,6 +141,8 @@ select:focus-visible { outline: 3px solid #b77716; outline-offset: 2px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .confused .cat-pose { animation: none; }
+  .patting .cat-pose, .patting .pixel-hearts { animation:none; }
+  .patting .pixel-hearts { opacity:1; }
 }
 @media screen {
   [data-theme="dark"] .empty, [data-theme="dark"] .cat-station,

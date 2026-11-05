@@ -1,11 +1,11 @@
 import {buildReports, pageChunks, NIGHT_AMOUNT, NIGHT_TIMES} from './model.mjs';
-import {readSchedule, readEmployees, validateEmployees} from './spreadsheet.mjs';
+import {readSchedule, readEmployees, validateEmployees, createExportWorkbook} from './spreadsheet.mjs';
 
 const $ = id => document.getElementById(id);
 const escape = text => String(text).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const money = value => value.toLocaleString('zh-TW');
 const statusLabel = {ready:'可列印', none:'無夜班', missing:'無班表資料', review:'待核對', unknown:'未建檔'};
-let eatingTimer;
+let catTimer;
 let employees = [], schedule = null, reports = [], selected = new Set(), activeName = '', importVersion = 0;
 
 function setScheduleEnabled(enabled) {
@@ -16,8 +16,8 @@ $('choose-roster').addEventListener('click', () => $('roster-file').click());
 $('choose-schedule').addEventListener('click', () => $('schedule-file').click());
 
 function setCatConfused(confused) {
-  clearTimeout(eatingTimer);
-  $('cat-station').classList.remove('eating');
+  clearTimeout(catTimer);
+  $('cat-station').classList.remove('eating', 'patting');
   $('cat-station').classList.toggle('confused', confused);
   $('cat-greeting').textContent = confused ? '這個看不懂~' : '喵~幫你填表!';
   if (confused) $('empty').hidden = false;
@@ -43,6 +43,7 @@ function reset() {
   $('workspace').hidden = true; $('empty').hidden = false;
   $('print-area').replaceChildren(); $('preview').replaceChildren();
   $('print-button').disabled = true; $('print-person').disabled = true;
+  $('export-button').disabled = true; $('export-status').textContent = '';
 }
 
 function formHtml(report, days, page, pageCount) {
@@ -51,7 +52,7 @@ function formHtml(report, days, page, pageCount) {
   report ??= {title: '', code: ''};
   const rows = Array.from({length:19}, (_, index) => {
     const night = days[index];
-    return `<tr>${index === 0 ? `<td class="work-type" rowspan="19">${blank ? '□' : '■'} 三班制（2輪1例隔週休班制）<br>□ 夜班制<br>□ 電務輪勤制<br>□ 工務夜間現場實際工作<br>□ 乘務隨車制<br>□ 車勤服務制</td>` : ''}<td>${night ? `${month}月${night.day}日` : '月　日'}</td><td class="time">${night ? NIGHT_TIMES[night.role].start : ''}</td><td class="time end-time">次日<span class="end-clock">${night ? NIGHT_TIMES[night.role].end : ''}</span></td><td>${night ? '1' : ''}</td><td>${night ? '1' : ''}</td><td>${night ? '400' : ''}</td><td></td></tr>`;
+    return `<tr>${index === 0 ? `<td class="work-type" rowspan="19">${['三班制（2輪1例隔週休班制）','夜班制','電務輪勤制','工務夜間現場實際工作','乘務隨車制','車勤服務制'].map((label,i) => `<span class="work-option">${!blank && i === 0 ? '■' : '□'} ${label}</span>`).join('')}</td>` : ''}<td>${night ? `${month}月${night.day}日` : '月　日'}</td><td class="time">${night ? NIGHT_TIMES[night.role].start : ''}</td><td class="time end-time">次日<span class="end-clock">${night ? NIGHT_TIMES[night.role].end : ''}</span></td><td>${night ? '1' : ''}</td><td>${night ? '1' : ''}</td><td>${night ? '400' : ''}</td><td></td></tr>`;
   }).join('');
   return `<article class="sheet" aria-label="個人夜點費請領表"><h2 class="form-title">${blank ? '____' : year-1911} 年 ${blank ? '____' : month} 月個人夜點費請領表</h2><div class="form-unit">單位：<span class="unit-value">竹南站</span></div><div class="form-identity"><span>姓名：<span class="signature"></span></span><span>（請簽名及蓋章）</span><span>職稱：<span class="title-value">${escape(report.title)}</span></span><span>員工代號：<span class="form-code">${escape(report.code)}</span></span></div><table class="claim-table"><colgroup><col style="width:30mm"><col style="width:22mm"><col style="width:16mm"><col style="width:22mm"><col style="width:23mm"><col style="width:25mm"><col style="width:18mm"><col style="width:34mm"></colgroup><thead><tr><th scope="col">夜間工作別</th><th scope="col">日期</th><th scope="col">開始<br>時間</th><th scope="col">結束<br>時間</th><th scope="col">基本時段<br>250 元<small>（22時至次日6時）</small></th><th scope="col">加發時段<br>加發150元<small>（24時至次日4時）</small></th><th scope="col">每晚<br>金額</th><th scope="col">直接主管<br>審核簽章</th></tr></thead><tbody>${rows}<tr class="total-row"><td></td><td class="total-label" colspan="3">${pageCount > 1 ? '本頁合計' : '合計'}</td><td>${blank ? '' : days.length + ' 次'}</td><td>${blank ? '' : days.length + ' 次'}</td><td>${blank ? '' : money(days.length*NIGHT_AMOUNT) + '元'}</td><td></td></tr></tbody></table><div class="form-notes"><p>註：</p><ol><li>依排定班表，於 22:00～06:00 間實際執行工作者，每次發給 250 元；如於 00:00～04:00 有實際工作事實者，再加發 150 元。每人每晚最高發給 400 元。</li><li>於 22:00～06:00 間有請假情形者，不予發給。</li><li>依其他規定支領與夜點費同性質給與者，僅得擇一支領（同時段只能擇一領取）。</li><li>各單位對所屬夜間工作，應確實督導考核。如有審核不實或虛報情事，除追繳已領之夜點費，失職人員視情節輕重依章議處。</li></ol></div>${pageCount > 1 ? `<div class="continuation">第 ${page+1}／${pageCount} 頁 · 全月 ${report.nights.length} 次，共 ${money(report.total)} 元</div>` : ''}</article>`;
 }
@@ -85,6 +86,9 @@ function showPerson(name) {
 function updateSelection() {
   $('print-button').disabled = !selected.size;
   $('print-button').textContent = `列印已勾選 ${selected.size} 人`;
+  $('export-button').disabled = !selected.size;
+  $('export-button').textContent = `匯出 Excel（已勾選 ${selected.size} 人）`;
+  $('export-status').textContent = '';
 }
 
 function renderNightEditor(person) {
@@ -99,6 +103,7 @@ $('night-roles').addEventListener('change', event => {
   const night = person?.nights.find(night => night.day === Number(select.dataset.day));
   if (!night) return;
   night.role = select.value;
+  $('export-status').textContent = '';
   $('preview').innerHTML = pageChunks(person.nights).map((days,index,array) => `<div class="preview-sheet-box">${formHtml(person,days,index,array.length)}</div>`).join('');
   sizePreview();
 });
@@ -176,22 +181,34 @@ $('select-all').addEventListener('click', () => {selected = new Set(reports.filt
 $('clear-all').addEventListener('click', () => {selected.clear();renderPeople();});
 $('print-button').addEventListener('click', () => printReports(selected));
 $('print-person').addEventListener('click', () => printReports(new Set([activeName])));
+$('export-button').addEventListener('click', () => {
+  if (!schedule || !selected.size) return;
+  try {
+    const workbook = createExportWorkbook(schedule, reports, selected);
+    XLSX.writeFile(workbook, `${schedule.year-1911}年${schedule.month}月夜點費_已勾選${selected.size}人.xlsx`, {compression:true});
+    $('export-status').textContent = `已匯出 ${selected.size} 人的彙總與逐日明細（含目前替班設定）。`;
+  } catch {
+    $('export-status').textContent = '匯出未完成，請再試一次，或使用列印另存 PDF。';
+  }
+});
 $('print-blank').addEventListener('click', () => {
   $('print-area').innerHTML = formHtml(null, [], 0, 1);
   document.title = '夜點費空白請領表';
   window.print();
 });
-function feedCat() {
+function playCat(state, message, duration) {
   if ($('cat-station').classList.contains('confused')) return;
-  clearTimeout(eatingTimer);
-  $('cat-station').classList.add('eating');
-  $('cat-greeting').textContent = '喵，夜點開動！你也記得休息。';
-  eatingTimer = setTimeout(() => {
-    $('cat-station').classList.remove('eating');
+  clearTimeout(catTimer);
+  $('cat-station').classList.remove('eating', 'patting');
+  $('cat-station').classList.add(state);
+  $('cat-greeting').textContent = message;
+  catTimer = setTimeout(() => {
+    $('cat-station').classList.remove(state);
     $('cat-greeting').textContent = '喵~幫你填表!';
-  }, 3600);
+  }, duration);
 }
-$('pet-cat').addEventListener('click', feedCat);
+$('pet-cat').addEventListener('click', () => playCat('eating', '喵，夜點開動！你也記得休息。', 3600));
+$('pet-head').addEventListener('click', () => playCat('patting', '呼嚕~謝謝你，慢慢核對就好。', 1600));
 
 window.addEventListener('afterprint', () => {$('print-area').replaceChildren();document.title='夜點費填表器';});
 new ResizeObserver(sizePreview).observe($('paper-viewport'));
